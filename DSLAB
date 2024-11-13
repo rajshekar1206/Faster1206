@@ -1,107 +1,136 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-struct node {
+typedef struct Node {
     int data;
-    struct node *left, *right;
-};
+    struct Node *left, *right;
+} Node;
 
-typedef struct node *BSTNODE;
-
-BSTNODE newNodeInBST(int item) {
-    BSTNODE temp = (BSTNODE)malloc(sizeof(struct node));
-    temp->data = item;
-    temp->left = temp->right = NULL;
-    return temp;
+// Function to create a new node
+Node* create_node(int data) {
+    Node* newNode = (Node*)malloc(sizeof(Node));
+    newNode->data = data;
+    newNode->left = newNode->right = NULL;
+    return newNode;
 }
 
-BSTNODE insertNodeInBST(BSTNODE node, int ele) {
-    if (node == NULL) {
-        printf("Successfully inserted.\n");
-        return newNodeInBST(ele);
+// Function to insert a node in the binary search tree
+void insert(Node** root, int data) {
+    if (*root == NULL) {
+        *root = create_node(data);
+    } else if (data < (*root)->data) {
+        insert(&((*root)->left), data);
+    } else if (data > (*root)->data) {
+        insert(&((*root)->right), data);
     }
-    if (ele < node->data) {
-        node->left = insertNodeInBST(node->left, ele);
-    } else if (ele > node->data) {
-        node->right = insertNodeInBST(node->right, ele);
+}
+
+// Function to search for a node
+Node* search(Node* root, int data) {
+    if (root == NULL || root->data == data) {
+        return root;
+    }
+    if (data < root->data) {
+        return search(root->left, data);
+    }
+    return search(root->right, data);
+}
+
+// Helper function to find the minimum value node
+Node* find_min(Node* root) {
+    while (root->left != NULL) {
+        root = root->left;
+    }
+    return root;
+}
+
+// Function to delete a node from the binary search tree
+Node* delete_node(Node** root, int data) {
+    if (*root == NULL) {
+        printf("Node not found\n");
+        return NULL;
+    }
+    if (data < (*root)->data) {
+        (*root)->left = delete_node(&((*root)->left), data);
+    } else if (data > (*root)->data) {
+        (*root)->right = delete_node(&((*root)->right), data);
     } else {
-        printf("Element already exists in BST.\n");
+        if ((*root)->left == NULL) {
+            Node* temp = (*root)->right;
+            free(*root);
+            *root = temp;
+            return *root;
+        } else if ((*root)->right == NULL) {
+            Node* temp = (*root)->left;
+            free(*root);
+            *root = temp;
+            return *root;
+        }
+        Node* temp = find_min((*root)->right);
+        (*root)->data = temp->data;
+        (*root)->right = delete_node(&((*root)->right), temp->data);
     }
-    return node;
+    return *root;
 }
 
-void inorderInBST(BSTNODE root) {
+// Function to display the binary tree (in-order traversal)
+void display(Node* root) {
     if (root != NULL) {
-        inorderInBST(root->left);
+        display(root->left);
         printf("%d ", root->data);
-        inorderInBST(root->right);
+        display(root->right);
     }
 }
 
-void preorderInBST(BSTNODE root) {
+// Function to free the entire tree
+void free_tree(Node* root) {
     if (root != NULL) {
-        printf("%d ", root->data);
-        preorderInBST(root->left);
-        preorderInBST(root->right);
-    }
-}
-
-void postorderInBST(BSTNODE root) {
-    if (root != NULL) {
-        postorderInBST(root->left);
-        postorderInBST(root->right);
-        printf("%d ", root->data);
+        free_tree(root->left);
+        free_tree(root->right);
+        free(root);
     }
 }
 
 int main() {
-    int x, op;
-    BSTNODE root = NULL;
-
+    Node *root = NULL;
+    int choice, data;
     while (1) {
-        printf("1. Insert\n2. Inorder Traversal\n3. Preorder Traversal\n4. Postorder Traversal\n5. Exit\n");
-        printf("Enter your option: ");
-        scanf("%d", &op);
-
-        switch (op) {
+        printf("1. Insert node\n");
+        printf("2. Search for node\n");
+        printf("3. Delete node\n");
+        printf("4. Display tree\n");
+        printf("5. Exit\n");
+        printf("Enter choice: ");
+        scanf("%d", &choice);
+        switch (choice) {
             case 1:
-                printf("Enter an element to be inserted: ");
-                scanf("%d", &x);
-                root = insertNodeInBST(root, x);
+                printf("Insert Node: ");
+                scanf("%d", &data);
+                insert(&root, data);
                 break;
             case 2:
-                if (root == NULL) {
-                    printf("Binary Search Tree is empty.\n");
+                printf("Search Node: ");
+                scanf("%d", &data);
+                if (search(root, data) != NULL) {
+                    printf("Node found\n");
                 } else {
-                    printf("Elements of the BST (in-order traversal): ");
-                    inorderInBST(root);
-                    printf("\n");
+                    printf("Node not found\n");
                 }
                 break;
             case 3:
-                if (root == NULL) {
-                    printf("Binary Search Tree is empty.\n");
-                } else {
-                    printf("Elements of the BST (pre-order traversal): ");
-                    preorderInBST(root);
-                    printf("\n");
-                }
+                printf("Delete node: ");
+                scanf("%d", &data);
+                delete_node(&root, data);
                 break;
             case 4:
-                if (root == NULL) {
-                    printf("Binary Search Tree is empty.\n");
-                } else {
-                    printf("Elements of the BST (post-order traversal): ");
-                    postorderInBST(root);
-                    printf("\n");
-                }
+                display(root);
+                printf("\n");
                 break;
             case 5:
+                free_tree(root);
                 exit(0);
             default:
-                printf("Invalid option. Please try again.\n");
+                printf("Invalid choice\n");
         }
     }
-
-    return 0;
 }
