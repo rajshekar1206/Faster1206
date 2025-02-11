@@ -1,36 +1,52 @@
-public class student1
-{
-int id;
-String name;
-student1()
-{
-System.out.println("this aa defualt constructor ");
+package q21972;
+import java.util.Scanner;
+class ObjectCounter {
+    // Static variable to keep track of the number of objects
+    
+	static int ObjectCount =0;
+    
+    public ObjectCounter() {
+	// Constructor increments the object count when an object is created
+	ObjectCount++;
+    
+	
+	
+    }
+    public static int getObjectCount() {  // Static method to get the current count of objects
+    	// Write your code to return the count here 
+    	return ObjectCount;
+    
+    	
+        
+    }
 }
-student1(int i,String n){
-id=i;
-name=n;
-}    
-void teacher()
-{
-System.out.println("this method overloading ");
+public class ObjectCountTest {
+
+
+
+
+    public static void main(String[] args) {
+        // Create a scanner object to take user input
+        Scanner scanner = new Scanner(System.in);
+
+        // Asking user for an input
+        System.out.print("Enter the number of objects to create: ");
+        int input = Integer.parseInt(scanner.nextLine()); // Convert the input to an integer
+        
+        // Create the objects based on user input
+        for (int i = 0; i < input; i++) {
+            new ObjectCounter();
+        }
+        
+        // Display the current object count
+        System.out.println("Total number of objects created: " + ObjectCounter.getObjectCount());
+
+        // Close the scanner
+        scanner.close();
+    }
+
+
 }
-void teacher(int a,int b)
-{
-int i,k;
-i=a;
-k=b;
-System.out.println(i+k);
-}
-public static void main(String[] args)
-{
-student1 s = new student1();
-System.out.println("\n Default Constructor values:\n");
-System.out.println("Student id:"+s.id+"\nstudent name:\n"+s.name);
-System.out.println("\nparameterized Constructor values: \n");
-student1 s1 = new student1(10,"david");
-student1 t=new student1();
-t.teacher();
-t.teacher(2,3);
-}
-}
- 
+
+
+
